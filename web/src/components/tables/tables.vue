@@ -239,7 +239,7 @@ export default {
             this.showCustomModal = false
             this.$Message.success('客户信息保存成功!')
             this.$refs.formValidate.resetFields()
-            this.$props.history.push('/customs/index')
+            this.$store.dispatch('getCustom')
           })
         } else {
           this.$Message.error('请补充完整客户信息!')

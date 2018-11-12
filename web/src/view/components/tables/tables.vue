@@ -9,8 +9,7 @@
 
 <script>
 import Tables from '_c/tables'
-import { getCustom } from '@/api/custom'
-import moment from 'moment'
+import {mapState} from 'vuex'
 export default {
   name: 'tables_page',
   components: {
@@ -29,7 +28,7 @@ export default {
         {title: '家庭住址', key: 'address', editable: true},
         {title: '备注', key: 'comment', editable: true},
         {
-          title: 'Handle',
+          title: '操作',
           key: 'handle',
           // options: ['delete'],
           button: [
@@ -52,9 +51,14 @@ export default {
             }
           ]
         }
-      ],
-      tableData: []
+      ]
+      // tableData: this.$store.state.custom.tableData
     }
+  },
+  computed: {
+    ...mapState({
+      tableData: state => state.custom.tableData
+    })
   },
   methods: {
     handleDelete (params) {
@@ -67,17 +71,7 @@ export default {
     }
   },
   mounted () {
-    getCustom().then(res => {
-      console.log(res)
-      let data = res.data.data
-      data.map((v, i) => {
-        v.gender = v.gender === 'male' ? '男' : '女'
-        v.birthday && (v.birthday = moment(v.birthday).format('YYYY-MM-DD'))
-        v.weddingday && (v.weddingday = moment(v.weddingday).format('YYYY-MM-DD'))
-        return v
-      })
-      this.tableData = data
-    })
+    this.$store.dispatch('getCustom')
   }
 }
 </script>

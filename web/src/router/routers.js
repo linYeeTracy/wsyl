@@ -47,7 +47,7 @@ export default [
   },
   {
     path: '/customs',
-    name: 'customs',
+    name: '客户列表',
     meta: {
       icon: 'logo-buffer',
       title: '客户列表'
