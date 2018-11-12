@@ -40,4 +40,12 @@ router.get('/getUserInfo', async (ctx) => {
     ctx.resp.fail();
   }
 });
+
+router.post('/logout', async (ctx) => {
+  try {
+    ctx.resp.success(null);
+  } catch (e) {
+    ctx.resp.fail();
+  }
+});
 module.exports = router;
