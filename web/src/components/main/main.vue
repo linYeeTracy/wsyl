@@ -163,7 +163,7 @@ export default {
     this.setLocal(this.$i18n.locale)
     // 文档提示
     this.$Notice.info({
-      title: '这里是提醒，可以是很多条',
+      title: '请关注近期提醒！',
       duration: 0
     })
     // 如果当前打开页面不在标签栏中，跳到homeName页

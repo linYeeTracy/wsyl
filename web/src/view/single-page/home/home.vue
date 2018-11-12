@@ -3,41 +3,33 @@
     <Row>
       <Card shadow>
         <timeline>
-          <timeline-title>纪念日提醒</timeline-title>
+          <timeline-title>一周提醒</timeline-title>
           <timeline-item v-for="(perday, perdayIndex) in warnList" :key="perdayIndex" bg-color="#9dd8e0">
             <div>
               <h1>{{getDateDesc(perday, perdayIndex)}}</h1>
               <ul v-if="perday && perday.length">
                 <li v-for="(warn, warnIndex) in perday" :key="warnIndex">
-                  <!-- 客户：{{item.name}},手机号：{{item.phone}}的生日 -->
                   <div v-if="isBirth(warn, perdayIndex)">
                     <Tag style="margin-right:10px" color="success">生日纪念日</Tag>
-                    <Tag color="primary">{{warn.name}}</Tag>
-                    <Tag color="warning">{{warn.phone}}</Tag>
+                    <Tag color="primary">姓名： {{warn.name}}</Tag>
+                    <Tag color="warning">手机： {{warn.phone}}</Tag>
                   </div>
                   <div v-if="isWedding(warn, perdayIndex)">
                     <Tag style="margin-right:10px" color="#ffa2d3">结婚纪念日</Tag>
-                    <Tag color="primary">{{warn.name}}</Tag>
-                    <Tag color="warning">{{warn.phone}}</Tag>
+                    <Tag color="primary">姓名： {{warn.name}}</Tag>
+                    <Tag color="warning">手机： {{warn.phone}}</Tag>
 
                   </div>
                   <div v-if="isBirth100(warn, perdayIndex)">
                     <Tag style="margin-right:10px" color="success">百日纪念日</Tag>
-                    <Tag color="primary">{{warn.name}}</Tag>
-                    <Tag color="warning">{{warn.phone}}</Tag>
-
+                    <Tag color="primary">姓名： {{warn.name}}</Tag>
+                    <Tag color="warning">手机： {{warn.phone}}</Tag>
                   </div>
                 </li>
               </ul>
               <div v-else>暂无提醒</div>
             </div>
           </timeline-item>
-          <!-- <timeline-item :hollow="true">
-            <div>
-              <h1>明天</h1>
-              <div>当日提醒</div>
-            </div>
-          </timeline-item> -->
         </timeline>
       </Card>
     </Row>
@@ -104,7 +96,54 @@ export default {
   },
   mounted () {
     getCustom({byDate: true}).then(res => {
-      this.warnList = res.data.data
+      let data = res.data.data
+      console.log(data)
+      const formatData = data.map((v, i) => {
+        v.gender = v.gender === 'male' ? '男' : '女'
+        v.birthday && (v.birthday = moment(v.birthday).format('YYYY-MM-DD'))
+        v.weddingday && (v.weddingday = moment(v.weddingday).format('YYYY-MM-DD'))
+        return v
+      })
+
+      let weekDayList = []
+      let weekWarns = [[], [], [], [], [], [], []]
+      // weekDayList.reduce((arr, next)=> {})
+      for (let i = 0; i < 7; i++) {
+        weekDayList.push(moment().add(i, 'days').format('MM-DD'))
+      }
+      console.log(weekDayList)
+      formatData.forEach((v, i) => {
+        const birthday = moment(v.birthday).format('MM-DD')
+        const weddingday = moment(v.weddingday).format('MM-DD')
+
+        if (v.isRemind) {
+          const remindDay = moment(v.birthday).add('100', 'days')
+          const diffday = remindDay.diff(moment(), 'days')
+          if (diffday >= 0 && diffday <= 6) {
+            weekWarns[diffday].push(v)
+          }
+        }
+        console.log(birthday, weddingday)
+        if (birthday === weddingday) {
+          weekWarns[weekDayList.indexOf(birthday)].push(v)
+        } else {
+          if (weekDayList.includes(birthday)) {
+            weekWarns[weekDayList.indexOf(birthday)].push(v)
+          }
+
+          if (weekDayList.includes(weddingday)) {
+            weekWarns[weekDayList.indexOf(weddingday)].push(v)
+          }
+        }
+      })
+      // const alldays = await Custom.getInfo({});
+      // f
+      // const formatDays = alldays.map((v, i)=> {
+      //   v.birthday = moment(v.birthday).utcOffset(480).format('YYYY-MM-DD')
+      //   v.weddingday = moment(v.weddingday).utcOffset(480).format('YYYY-MM-DD')
+      //   return v
+      // console.log(weekWarns)
+      this.warnList = weekWarns
     })
   },
   methods: {
@@ -124,10 +163,23 @@ export default {
       }
     },
     isBirth (warn, index) {
-      return moment(warn.birthday).diff(moment(), 'days') === index
+      if (!warn.birthday) {
+        return false
+      }
+      const _birthday = `${moment().format('YYYY-')}${moment(warn.birthday).format('MM-DD')}`
+      const _currday = moment().format('YYYY-MM-DD')
+      console.log(_birthday, _currday)
+      return moment(_birthday).diff(moment(_currday), 'days') === index
     },
     isWedding (warn, index) {
-      return moment(warn.weddingday).diff(moment(), 'days') === index
+      if (!warn.weddingday) {
+        return false
+      }
+      const _birthday = `${moment().format('YYYY-')}${moment(warn.weddingday).format('MM-DD')}`
+      const _currday = moment().format('YYYY-MM-DD')
+      console.log(_birthday, _currday, moment(_birthday).diff(moment(_currday), 'days'), index)
+
+      return moment(_birthday).diff(moment(_currday), 'days') === index
     },
     isBirth100 (warn, index) {
       return warn.isRemind

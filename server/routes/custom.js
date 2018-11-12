@@ -27,39 +27,22 @@ router.get('/', async (ctx) => {
       for(let i=-1; i<6; i++) {
         weekDayList.push(i)
       }
-      const weekWarns = await Promise.all(weekDayList.map(v => {
-        return Custom.getInfo({
-          $or: [
-            {
-              weddingday: {
-                  $gte: moment().add(v, 'days'),
-                  $lte: moment().add(v+1, 'days')
-              }
-            },
-            {
-              birthday: {
-                $gte: moment().add(v, 'days'),
-                $lte: moment().add(v+1, 'days')
-              }
-            }
-          ]
-        })
-      }))
-      const reminds = await Custom.getInfo({
-        isRemind: true
+      const alldays = await Custom.getInfo({});
+      const formatDays = alldays.map((v, i)=> {
+        v.birthday = moment(v.birthday).utcOffset(480).format('YYYY-MM-DD')
+        v.weddingday = moment(v.weddingday).utcOffset(480).format('YYYY-MM-DD')
+        return v
       })
-      reminds.forEach((v, i)=> {
-        const warnday = moment(v.birthday).add('100', 'days');
-        const diffday = warnday.diff(moment(), 'days')
-        if(diffday>= 0 && diffday <=6) {
-          weekWarns[diffday].push(v)
-        }
-      });
-      ctx.resp.success(weekWarns);
-      return; 
+      ctx.resp.success(formatDays);
+      return ;
     }
     const data = await Custom.getInfo({});
-    ctx.resp.success(util.formatDatas(data));
+    const formatDays = data.map((v, i)=> {
+      v.birthday = moment(v.birthday).utcOffset(480).format('YYYY-MM-DD')
+      v.weddingday = moment(v.weddingday).utcOffset(480).format('YYYY-MM-DD')
+      return v
+    })
+    ctx.resp.success(util.formatDatas(formatDays));
   } catch (e) {
     ctx.resp.fail();
   }

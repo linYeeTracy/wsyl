@@ -10,6 +10,7 @@
 <script>
 import Tables from '_c/tables'
 import { getCustom } from '@/api/custom'
+import moment from 'moment'
 export default {
   name: 'tables_page',
   components: {
@@ -36,7 +37,7 @@ export default {
               return h('Poptip', {
                 props: {
                   confirm: true,
-                  title: '你确定要删除吗?'
+                  title: '后续需补充功能'
                 },
                 on: {
                   'on-ok': () => {
@@ -68,7 +69,14 @@ export default {
   mounted () {
     getCustom().then(res => {
       console.log(res)
-      this.tableData = res.data.data
+      let data = res.data.data
+      data.map((v, i) => {
+        v.gender = v.gender === 'male' ? '男' : '女'
+        v.birthday && (v.birthday = moment(v.birthday).format('YYYY-MM-DD'))
+        v.weddingday && (v.weddingday = moment(v.weddingday).format('YYYY-MM-DD'))
+        return v
+      })
+      this.tableData = data
     })
   }
 }

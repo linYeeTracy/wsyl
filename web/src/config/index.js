@@ -14,7 +14,7 @@ export default {
    */
   baseUrl: {
     dev: 'http://localhost:6677/api/v1',
-    pro: 'http://172.16.42.34:6677'
+    pro: 'http://172.16.42.34:6677/api/v1'
   },
   /**
    * @description 默认打开的首页的路由name值，默认为home

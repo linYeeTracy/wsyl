@@ -102,7 +102,7 @@ import TablesEdit from './edit.vue'
 import handleBtns from './handle-btns'
 
 import './index.less'
-import {addCustom} from '@/api/custom'
+import {addCustom, getCustom} from '@/api/custom'
 
 export default {
   name: 'Tables',
@@ -214,7 +214,7 @@ export default {
         email: '',
         address: '',
         comment: '',
-        isRemind: 1
+        isRemind: 0
       },
       ruleValidate: {
         name: [
@@ -237,8 +237,9 @@ export default {
           addCustom(this.formValidate).then(res => {
             this.modalLoading = false
             this.showCustomModal = false
-            this.$Message.success('客户信息保存成功!可前往客户列表页查看修改～')
+            this.$Message.success('客户信息保存成功!')
             this.$refs.formValidate.resetFields()
+            this.$props.history.push('/customs/index')
           })
         } else {
           this.$Message.error('请补充完整客户信息!')
